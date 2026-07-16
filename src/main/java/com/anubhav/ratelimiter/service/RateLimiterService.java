@@ -9,8 +9,8 @@ public class RateLimiterService {
 
     private final RateLimiter rateLimiter;
 
-    public RateLimiterService() {
-        this.rateLimiter = new FixedWindowRateLimiter(5, 60_000);
+    public RateLimiterService(RateLimiter rateLimiter) {
+        this.rateLimiter = rateLimiter;
     }
 
     public boolean allowRequest(String clientId) {
