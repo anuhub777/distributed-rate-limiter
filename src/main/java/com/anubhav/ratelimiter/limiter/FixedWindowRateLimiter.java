@@ -1,6 +1,7 @@
 package com.anubhav.ratelimiter.limiter;
 
 import com.anubhav.ratelimiter.model.RateLimitInfo;
+import com.anubhav.ratelimiter.storage.RateLimitStorage;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,14 +9,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class FixedWindowRateLimiter implements RateLimiter {
 
-    private final ConcurrentHashMap<String, RateLimitInfo> clientRequests;
+    private final RateLimitStorage storage;
 
     private final int maxRequests;
 
     private final long windowSizeInMillis;
 
-    public FixedWindowRateLimiter() {
-        this.clientRequests = new ConcurrentHashMap<>();
+    public FixedWindowRateLimiter(RateLimitStorage storage) {
+        this.storage = storage;
         this.maxRequests = 5;
         this.windowSizeInMillis = 60_000;
     }
@@ -24,10 +25,10 @@ public class FixedWindowRateLimiter implements RateLimiter {
     public boolean allowRequest(String clientId) {
 
         long currentTime = System.currentTimeMillis();
-        RateLimitInfo rateLimitInfo = clientRequests.get(clientId);
+        RateLimitInfo rateLimitInfo = storage.get(clientId);
         if (rateLimitInfo == null) {
 
-            clientRequests.put(
+            storage.put(
                     clientId,
                     new RateLimitInfo(1, currentTime)
             );
