@@ -1,5 +1,6 @@
 package com.anubhav.ratelimiter.limiter;
 
+import com.anubhav.ratelimiter.config.RateLimiterProperties;
 import com.anubhav.ratelimiter.model.RateLimitInfo;
 import com.anubhav.ratelimiter.storage.RateLimitStorage;
 import org.springframework.stereotype.Component;
@@ -15,10 +16,13 @@ public class FixedWindowRateLimiter implements RateLimiter {
 
     private final long windowSizeInMillis;
 
-    public FixedWindowRateLimiter(RateLimitStorage storage) {
+    public FixedWindowRateLimiter(
+            RateLimitStorage storage,
+            RateLimiterProperties properties
+    ) {
         this.storage = storage;
-        this.maxRequests = 5;
-        this.windowSizeInMillis = 60_000;
+        this.maxRequests = properties.getMaxRequests();
+        this.windowSizeInMillis = properties.getWindowSize();
     }
 
     @Override
