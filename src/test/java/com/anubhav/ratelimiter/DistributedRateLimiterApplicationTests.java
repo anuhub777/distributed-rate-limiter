@@ -1,4 +1,4 @@
-package com.anubhav.ratelimiter.distributed_rate_limiter;
+package com.anubhav.ratelimiter;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

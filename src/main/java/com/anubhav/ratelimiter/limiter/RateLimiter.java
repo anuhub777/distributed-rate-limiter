@@ -1,4 +1,4 @@
-package com.anubhav.ratelimiter.distributed_rate_limiter.limiter;
+package com.anubhav.ratelimiter.limiter;
 
 public interface RateLimiter {
 
