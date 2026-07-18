@@ -1,10 +1,10 @@
 package com.anubhav.ratelimiter.storage;
 
-import com.anubhav.ratelimiter.model.RateLimitInfo;
-
 public interface RateLimitStorage {
 
-    RateLimitInfo get(String clientId);
+    Long increment(String clientId);
 
-    void put(String clientId, RateLimitInfo rateLimitInfo);
+    void setExpiration(String clientId, long seconds);
+
+    Long getTimeToLive(String clientId);
 }
