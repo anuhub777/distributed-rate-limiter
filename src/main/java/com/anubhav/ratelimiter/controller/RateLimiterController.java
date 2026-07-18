@@ -1,6 +1,7 @@
 package com.anubhav.ratelimiter.controller;
 
 import com.anubhav.ratelimiter.model.RateLimitResponse;
+import com.anubhav.ratelimiter.model.RateLimitResult;
 import com.anubhav.ratelimiter.service.RateLimiterService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,18 +19,15 @@ public class RateLimiterController {
     @GetMapping("/check")
     public RateLimitResponse checkRateLimit(@RequestParam String clientId) {
 
-        boolean allowed = rateLimiterService.allowRequest(clientId);
-
-        if (allowed) {
-            return new RateLimitResponse(
-                    true,
-                    "Request Allowed"
-            );
-        }
+        RateLimitResult result = rateLimiterService.allowRequest(clientId);
 
         return new RateLimitResponse(
-                false,
-                "Rate Limit Exceeded"
+                result.isAllowed(),
+                result.isAllowed()
+                        ? "Request Allowed"
+                        : "Rate Limit Exceeded",
+                result.getRemainingRequests(),
+                result.getRetryAfter()
         );
     }
 }

@@ -1,6 +1,7 @@
 package com.anubhav.ratelimiter.limiter;
 
 import com.anubhav.ratelimiter.config.RateLimiterProperties;
+import com.anubhav.ratelimiter.model.RateLimitResult;
 import com.anubhav.ratelimiter.storage.RateLimitStorage;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +22,24 @@ public class FixedWindowRateLimiter implements RateLimiter {
     }
 
     @Override
-    public boolean allowRequest(String clientId) {
+    public RateLimitResult allowRequest(String clientId) {
 
-        String key = "rate_limit:" + clientId;
-
-        Long requestCount = storage.increment(key);
+        Long requestCount = storage.increment(clientId);
 
         if (requestCount == 1) {
-            storage.setExpiration(key, windowSizeInMillis / 1000);
+            storage.setExpiration(clientId, windowSizeInMillis / 1000);
         }
 
-        return requestCount <= maxRequests;
+        boolean allowed = requestCount <= maxRequests;
+
+        long remainingRequests = Math.max(0, maxRequests - requestCount);
+
+        long retryAfter = allowed ? 0 : storage.getTimeToLive(clientId);
+
+        return new RateLimitResult(
+                allowed,
+                remainingRequests,
+                retryAfter
+        );
     }
 }

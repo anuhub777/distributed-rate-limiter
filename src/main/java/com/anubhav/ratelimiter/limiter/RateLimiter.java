@@ -1,7 +1,9 @@
 package com.anubhav.ratelimiter.limiter;
 
+import com.anubhav.ratelimiter.model.RateLimitResult;
+
 public interface RateLimiter {
 
-    boolean allowRequest(String clientId);
+    RateLimitResult allowRequest(String clientId);
 
 }

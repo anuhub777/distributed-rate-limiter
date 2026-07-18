@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RateLimitResponse {
+public class RateLimitResult {
 
     private boolean allowed;
-
-    private String message;
 
     private long remainingRequests;
 

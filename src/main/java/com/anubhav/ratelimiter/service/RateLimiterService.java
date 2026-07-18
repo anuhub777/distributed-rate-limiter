@@ -2,6 +2,7 @@ package com.anubhav.ratelimiter.service;
 
 import com.anubhav.ratelimiter.limiter.FixedWindowRateLimiter;
 import com.anubhav.ratelimiter.limiter.RateLimiter;
+import com.anubhav.ratelimiter.model.RateLimitResult;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ public class RateLimiterService {
         this.rateLimiter = rateLimiter;
     }
 
-    public boolean allowRequest(String clientId) {
+    public RateLimitResult allowRequest(String clientId){
         return rateLimiter.allowRequest(clientId);
     }
 }
