@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.*;
+
 import com.anubhav.ratelimiter.config.RateLimiterProperties;
 
 class FixedWindowRateLimiterTest {
@@ -18,11 +20,6 @@ class FixedWindowRateLimiterTest {
     private RateLimitStorage storage;
 
     private FixedWindowRateLimiter limiter;
-
-    @Test
-    void test() {
-        when(storage.increment("anubhav")).thenReturn(1L);
-    }
 
     @BeforeEach
     void setUp() {
@@ -44,7 +41,42 @@ class FixedWindowRateLimiterTest {
         RateLimitResult result = limiter.allowRequest("anubhav");
 
         assertTrue(result.isAllowed());
-
         assertEquals(4, result.getRemainingRequests());
+
+        verify(storage).setExpiration("anubhav", 60L);
+    }
+
+    @Test
+    void shouldRejectRequestWhenLimitExceeded() {
+
+        when(storage.increment("anubhav")).thenReturn(6L);
+        when(storage.getTimeToLive("anubhav")).thenReturn(45L);
+
+        RateLimitResult result = limiter.allowRequest("anubhav");
+
+        assertFalse(result.isAllowed());
+        assertEquals(0, result.getRemainingRequests());
+        assertEquals(45L, result.getRetryAfter());
+    }
+
+    @Test
+    void shouldNotSetExpirationAfterFirstRequest() {
+
+        when(storage.increment("anubhav")).thenReturn(2L);
+
+        limiter.allowRequest("anubhav");
+
+        verify(storage, never()).setExpiration("anubhav", 60L);
+    }
+
+    @Test
+    void shouldReturnZeroRetryAfterForAllowedRequest() {
+
+        when(storage.increment("anubhav")).thenReturn(3L);
+
+        RateLimitResult result = limiter.allowRequest("anubhav");
+
+        assertTrue(result.isAllowed());
+        assertEquals(0L, result.getRetryAfter());
     }
 }
